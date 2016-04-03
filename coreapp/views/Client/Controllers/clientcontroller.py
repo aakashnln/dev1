@@ -1,6 +1,6 @@
 from django.shortcuts import render,render_to_response
 from django.http import JsonResponse
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect,HttpResponse
 from django.views.generic import View
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -23,7 +23,7 @@ from django.core.mail import send_mail
 
 def homepage(request):
 	print 'Loading landing page'
-	return render(request, 'index.html')
+	return render(request, 'client_templates/index.html')
 
 # class ClientController(View):
 """ClientController does the followin:
@@ -57,7 +57,7 @@ def client_create(request):
 			# by creating a model object and populating the
 			# data from the form object, but here we are just
 			# rendering a success template page.
-			return render(request, "success.html")
+			return render(request, "client_templates/success.html")
 	# This means that the request is a GET request. So we need to
 	# create an instance of the RegistrationForm class and render it in
 	# the template
@@ -68,9 +68,9 @@ def client_create(request):
 	# be rendered with the entered data and error messages. Otherwise an empty
 	# form will be rendered. Check the comments in the registration_form.html template
 	# to understand how this is done.
-	return render(request, "clientsignup.html",
+	return render(request, "client_templates/clientsignup.html",
 				{ "form" : form })
-	# return render(request, 'clientsignup.html')
+	# return render(request, 'client_templates/clientsignup.html')
 	# pass
 
 @csrf_protect
@@ -122,23 +122,22 @@ def client_register(request):
 			email_body = "Hey %s, thanks for signing up. To activate your account, click this link within \
 			48hours http://127.0.0.1:8000/client/client_confirmation/%s" % (client_username, activation_key)
 
-			send_mail(email_subject, email_body, 'aakashnln11.4@gmail.com',
-				[client_email], fail_silently=False)
+			# send_mail(email_subject, email_body, 'aakashnln11.4@gmail.com',[client_email], fail_silently=False)
 
-			return HttpResponseRedirect('/client/client_register_success')
+			return HttpResponseRedirect('/client/register_success')
 
 			request.session['registered']=True #For display purposes
 			return redirect(home)
 	else:
 		form = RegistrationForm()
 		#args['form'] = RegistrationForm()
-	# return render_to_response('clientsignup.html', args, context_instance=RequestContext(request))
-	return render(request, 'clientsignup.html', { "form" : form })
+	# return render_to_response('client_templates/clientsignup.html', args, context_instance=RequestContext(request))
+	return render(request, 'client_templates/clientsignup.html', { "form" : form })
 
 @csrf_protect
 def client_register_success(request):
 	print 'success page'
-	return render(request, 'success.html')
+	return render(request, 'client_templates/success.html')
 
 def client_confirmation(request, activation_key):
 	#check if user is already logged in and if he is redirect him to some other url, e.g. home
@@ -148,14 +147,14 @@ def client_confirmation(request, activation_key):
 	# check if there is ClientProfile which matches the activation key (if not then display 404)
 	client_profile = get_object_or_404(ClientProfile, activation_key=activation_key)
 
-	#check if the activation key has expired, if it hase then render confirm_expired.html
+	#check if the activation key has expired, if it hase then render client_templates/confirm_expired.html
 	if client_profile.key_expires < timezone.now():
-		return render_to_response('confirm_expired.html')
+		return render_to_response('client_templates/confirm_expired.html')
 	#if the key hasn't expired save user and set him as active and render some template to confirm activation
 	client = client_profile.client
 	client.client_status = '2'
 	client.save()
-	return render_to_response('confirm.html')
+	return render_to_response('client_templates/confirm.html')
 
 def client_login(request):
 	# client login
