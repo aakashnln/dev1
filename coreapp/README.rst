@@ -27,3 +27,7 @@ django-simple-captcha
 djangorestframework
 markdown       # Markdown support for the browsable API.
 django-filter
+mongoengine
+django-multiselectfield
+
+sudo apt-get install libgdal-dev

@@ -1,4 +1,4 @@
-from django.shortcuts import render,render_to_response
+from django.shortcuts import render,render_to_response,redirect,get_object_or_404
 from django.http import JsonResponse
 from django.http import HttpResponseRedirect,HttpResponse
 from django.views.generic import View
@@ -13,6 +13,9 @@ import hashlib, datetime, random
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from dashboardcontroller import *
 # Create your views here.
 
 # class ClientController(object):
@@ -91,7 +94,7 @@ def client_register(request):
 			client_phone_number = form.cleaned_data['phone_number']
 			client_company = form.cleaned_data['company']
 
-			client_password = hashlib.sha1(form.cleaned_data['password'])
+			client_password = hashlib.sha1(form.cleaned_data['password']).hexdigest()
 
 			salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
 
@@ -121,18 +124,40 @@ def client_register(request):
 			email_subject = 'Account confirmation'
 			email_body = "Hey %s, thanks for signing up. To activate your account, click this link within \
 			48hours http://127.0.0.1:8000/client/client_confirmation/%s" % (client_username, activation_key)
+			print email_body
 
 			# send_mail(email_subject, email_body, 'aakashnln11.4@gmail.com',[client_email], fail_silently=False)
 
-			return HttpResponseRedirect('/client/register_success')
+			# return HttpResponseRedirect('/client/register_success')
 
 			request.session['registered']=True #For display purposes
-			return redirect(home)
+			return redirect('/client/register_success/')
 	else:
 		form = RegistrationForm()
 		#args['form'] = RegistrationForm()
 	# return render_to_response('client_templates/clientsignup.html', args, context_instance=RequestContext(request))
 	return render(request, 'client_templates/clientsignup.html', { "form" : form })
+
+def authenticate(email=None, password=None):
+		"""
+		Authentication method
+		"""
+		try:
+			client = Client.objects.get(client_email=email)
+			if client.check_password(password):
+				print client.client_email
+				return client
+		except Client.DoesNotExist:
+			return None
+
+def get_client(_id):
+	try:
+		client = Client.objects.get(pk=_id)
+		if client.client_status in ['2','3']:
+			return client
+		return None
+	except Client.DoesNotExist:
+		return None
 
 @csrf_protect
 def client_register_success(request):
@@ -141,7 +166,8 @@ def client_register_success(request):
 
 def client_confirmation(request, activation_key):
 	#check if user is already logged in and if he is redirect him to some other url, e.g. home
-	if request.client.is_authenticated():
+	if request.user.is_authenticated():
+		print 'user authenticated'
 		HttpResponseRedirect('/')
 
 	# check if there is ClientProfile which matches the activation key (if not then display 404)
@@ -158,7 +184,31 @@ def client_confirmation(request, activation_key):
 
 def client_login(request):
 	# client login
+	# print 'user',request.user
+	logout(request)
+	username = password = ''
+	if request.method == 'POST':
+		if request.POST:
+			email = request.POST['username']
+			password = request.POST['password']
 
-	pass
+			client = authenticate(email=email, password=password)
+			if client is not None:
+				if client.is_active:
+					request.user = client
+					# print request.user.client_name
+					client.client_login(request)
+					# return HttpResponseRedirect('/client/register_success/')
+					return redirect('/client/dashboard/')
+					# client_dashboard(request)
+				else:
+					print 'user not activated'
+			else:
+				print 'user not found'
+	return render(request,'client_templates/login.html')
 
-	
+def client_logout(request):
+	logout(request)
+	return redirect('homepage')
+# @login_required(login_url='/login/')
+
