@@ -3,8 +3,11 @@ from django.dispatch import receiver
 from django.conf import settings
 import os.path
 from coreapp.models import *
+import django.dispatch
 
-@receiver(post_save, sender=TripLog)
+update_dashboad = django.dispatch.Signal(providing_args=["post","request"])
+
+@receiver(update_dashboad, sender=TripLog)
 def model_post_save(sender, **kwargs):
 	print 'new trip saved in TripLog'
 	# TODO add impresions analytics code here and other 

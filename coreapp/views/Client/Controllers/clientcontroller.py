@@ -80,8 +80,13 @@ def client_create(request):
 def client_register(request):
 	# args = {}
 	# args.update(csrf(request))
+
+	if 'client_id' in request.session.keys():
+		return redirect('Client_dashboard')
+
 	if request.user.is_authenticated():
 		return redirect(home)
+
 	registration_form = RegistrationForm()
 	if request.method == 'POST':
 		form = RegistrationForm(request.POST)
@@ -189,12 +194,13 @@ def client_login(request):
 	username = password = ''
 	if request.method == 'POST':
 		if request.POST:
-			email = request.POST['username']
+			logout(request)
+			email = request.POST['email']
 			password = request.POST['password']
 
 			client = authenticate(email=email, password=password)
 			if client is not None:
-				if client.is_active:
+				if client.client_status == '2':
 					request.user = client
 					# print request.user.client_name
 					client.client_login(request)
@@ -202,9 +208,13 @@ def client_login(request):
 					return redirect('/client/dashboard/')
 					# client_dashboard(request)
 				else:
-					print 'user not activated'
+					print 'user not activated',client.client_status
+					error = 'Email has not been activated, our team has been informed and they will connect with you shortly.'
+					return render(request,'client_templates/login.html',{'error':error})
 			else:
 				print 'user not found'
+				error = 'Email or password is not correct'
+				return render(request,'client_templates/login.html',{'error':error})
 	return render(request,'client_templates/login.html')
 
 def client_logout(request):

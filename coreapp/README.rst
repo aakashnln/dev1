@@ -31,3 +31,26 @@ mongoengine
 django-multiselectfield
 
 sudo apt-get install libgdal-dev
+
+installing rabbitMQ
+https://www.rabbitmq.com/install-debian.html
+sudo invoke-rc.d rabbitmq-server stop/start/etc
+
+
+pip install django-celery
+Add djcelery to INSTALLED_APPS.
+python manage.py migrate djcelery
+python manage.py syncdb
+Configure celery to use the django-celery backend.
+
+For the database backend you must use:
+
+app.conf.update(
+    CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
+)
+For the cache backend you can use:
+
+app.conf.update(
+    CELERY_RESULT_BACKEND='djcelery.backends.cache:CacheBackend',
+)
+If you have connected Celery to your Django settings then you can add this directly into your settings module (without the app.conf.update part)

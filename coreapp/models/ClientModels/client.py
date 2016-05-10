@@ -147,4 +147,42 @@ class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 		('4', 'Unknown'), # not defined
 		)
 	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
-    
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wrap type
+	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)
+	campaign_detail = models.OneToOneField(ClientCampaignDetail, on_delete=models.CASCADE)
+	daily_driver_on_road = models.IntegerField(blank=False,default=0.0)
+	daily_total_distance_km = models.FloatField(blank=False,default=0.0)
+	daily_total_impressions = models.FloatField(blank=False,default=0.0)
+	daily_total_cost = models.FloatField(blank=False,default=0.0)
+	WRAP_TYPES = (
+		# ('0', 'All'),
+		('1', 'Full'),
+		('2', 'Partial'),# back doors and back hatch
+		('3', 'Panel'), # only doors
+		('4', 'Unknown'), # not defined
+		)
+	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+
+class ClientCampaignDashboard(models.Model): # can be multiple , one per wrap type
+	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)
+	campaign_detail = models.OneToOneField(ClientCampaignDetail, on_delete=models.CASCADE)
+	driver_on_road = models.IntegerField(blank=False,default=0.0)
+	total_distance_km = models.FloatField(blank=False,default=0.0)
+	total_impressions = models.FloatField(blank=False,default=0.0)
+	total_cost = models.FloatField(blank=False,default=0.0)
+	WRAP_TYPES = (
+		# ('0', 'All'),
+		('1', 'Full'),
+		('2', 'Partial'),# back doors and back hatch
+		('3', 'Panel'), # only doors
+		('4', 'Unknown'), # not defined
+		)
+	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
