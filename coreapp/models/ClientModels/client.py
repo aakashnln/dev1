@@ -111,6 +111,7 @@ class ClientCampaign(models.Model):
 	updated_at = models.DateTimeField(auto_now=True)
 	# campaign_perimeter = gismodels.PolygonField(blank=False) # stored as string version of geoJson
 	campaign_perimeter = models.CharField(max_length=1000,blank=False) # stored as string version of geoJson
+	campaign_city = models.CharField(max_length=100,default='') # to be filled from admin panel
 	start_date = models.DateTimeField()
 	end_date = models.DateTimeField()
 	total_distance = models.FloatField(default=0.0)# sums of drives distances having same campaign ids
@@ -132,6 +133,8 @@ class ClientCampaign(models.Model):
 		('5', 'Unknown'),
 		)
 	campaign_status = models.CharField(max_length=1,choices=CAMPAIGN_STATUS,default='4')
+	def __unicode__(self):
+		return self.campaign_name
 
 class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)
@@ -139,6 +142,8 @@ class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 	daily_km_cap = models.FloatField(blank=False,default=0.0)
 	daily_earning_max = models.FloatField(blank=False,default=0.0)
 	daily_earning_min = models.FloatField(blank=False,default=0.0)
+	cars_required = models.IntegerField(blank=False,default=0)
+	cars_remaining = models.IntegerField(blank=False,default=0)
 	WRAP_TYPES = (
 		# ('0', 'All'),
 		('1', 'Full'),
@@ -149,6 +154,7 @@ class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+
 
 class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wrap type
 	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)

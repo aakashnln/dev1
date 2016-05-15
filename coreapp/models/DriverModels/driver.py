@@ -8,7 +8,7 @@ class Driver(models.Model):
     uuid = models.CharField(max_length=200,blank=False)
     name = models.CharField(max_length=200,blank=False,default='') #to be filled by agent upon call and vehicle inspection
     username = models.CharField(max_length=200,blank=False)
-    company = models.CharField(max_length=200)
+    company = models.CharField(max_length=200,blank=True)
     address  = models.TextField(max_length=500,blank=False)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999999'. Up to 15 digits allowed.")
     phone_number = models.CharField(max_length=15,validators=[phone_regex],unique=True, blank=False) # validators should be a list
@@ -18,7 +18,8 @@ class Driver(models.Model):
         ('1', 'New'),
         ('2', 'Verified'),
         ('3', 'Active'),
-        ('4', 'Unknown'),
+        ('4', 'Wrapped'),
+        ('5', 'Unknown'),
         )
     status = models.CharField(max_length=1,choices=STATUS)
     VEHICLE_TYPE = (
@@ -116,7 +117,7 @@ class DriverCampaign(models.Model):
         self.updated_at = datetime.datetime.now()
         return super(DriverCampaign, self).save(*args, **kwargs)
     
-class DriverDailyEarning(object):
+class DriverDailyEarning(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
     total_trip_earning = models.FloatField(default=0.0)
     trip_count = models.IntegerField(default=0)

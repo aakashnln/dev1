@@ -20,6 +20,7 @@ from django.db.models import F
 import coreapp.signals
 from coreapp.tasks import *
 import json
+import traceback
 # Create your views here.
 
 def driver_homepage(request):
@@ -39,8 +40,8 @@ def driver_register(request):
 		# return redirect('driver_dashboard')
 		logout(request)
 
-	if request.user.is_authenticated():
-		return redirect(home)
+	# if request.user.is_authenticated():
+	# 	return redirect(home)
 
 	if request.method == 'POST':
 		data = json.loads(request.body)
@@ -55,7 +56,7 @@ def driver_register(request):
 		password = hashlib.sha1(data['password']).hexdigest()
 		password_confimation = hashlib.sha1(data['password_confirmation']).hexdigest()
 		if password!=password_confimation:
-			return JsonResponse({'valid':False,'errors':'Passwords not same'})
+			return JsonResponse({'valid':False,'error':'Passwords not same'})
 
 		salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
 
@@ -72,14 +73,16 @@ def driver_register(request):
 		datas['password'] = password
 		datas['status']='1'
 		#save client data
-		client = form.save(datas)
-
+		# client = form.save(datas)
+		driver = Driver(name=datas['username'],username=datas['username'],company='',address='',phone_number=datas['phone_number'],email=datas['email'],password=datas['password'],status=datas['status'])
+		driver.save()
 		#Get client by username
 		# client=Client.objects.get(client_username=client_username)
 
 		# Create and save user profile
-		new_profile = DriverProfile(driver=driver, activation_key=activation_key,key_expires=key_expires)
-		new_profile.save()
+		# add change to OTP system
+		# new_profile = DriverProfile(driver=driver, activation_key=activation_key,key_expires=key_expires)
+		# new_profile.save()
 
 		# Send email with activation key
 		email_subject = 'Account confirmation'
@@ -92,12 +95,13 @@ def driver_register(request):
 		# return HttpResponseRedirect('/client/register_success')
 
 		request.session['registered']=True #For display purposes
-		return JsonResponse({'valid':False,'errors':'Passwords not same'})
-	else:
-		form = RegistrationForm()
+		return JsonResponse({'valid':True,'status':datas['status']})
+	# else:
+	# 	form = RegistrationForm()
 		#args['form'] = RegistrationForm()
 	# return render_to_response('client_templates/clientsignup.html', args, context_instance=RequestContext(request))
-	return render(request, 'client_templates/clientsignup.html', { "form" : form })
+	# return render(request, 'client_templates/clientsignup.html', { "form" : form })
+	return JsonResponse({'valid':False})
 
 def authenticate(email=None,phone_number=None, password=None):
 		"""
@@ -124,12 +128,13 @@ def get_client(_id):
 		return None
 
 def get_driver_status(request):
-	res = {}
+	res = {'valid':False}
 	if request.method == 'POST':
 		if request.POST: #TODO add session check for returning the status
 			data = json.loads(request.body)
 			username = data['username']
-			driver = Driver.objects.get(username=username)
+			uuid = data['uuid']
+			driver = Driver.objects.get(uuid=uuid,username=username)
 			if driver is not None:
 				res['valid'] = True
 				res['status'] = driver.status
@@ -138,7 +143,8 @@ def get_driver_status(request):
 			else:
 				print 'user not found'
 				res['valid'] = False
-				res['errors'] = 'No info'
+				res['error'] = 'Some error occured, please try again after some time.'
+	return JsonResponse(res)
 
 def driver_login(request):
 	# client login
@@ -162,30 +168,126 @@ def driver_login(request):
 				if driver.status == '3':
 					request.user = driver
 					# print request.user.client_name
-					drive.driver_login(request)
+					driver.driver_login(request)
 					# return HttpResponseRedirect('/client/register_success/')
 					# return redirect('/client/dashboard/')
 					# client_dashboard(request)
 					res['valid'] = True
 					res['messages'] = "Welcome"
 					res['email'] = email
-					res['username'] = driver.drive_username
+					res['phnum'] = driver.phone_number
+					res['username'] = driver.username
+					res['status'] = driver.status
+					if driver.uuid != data['uuid']:
+						driver.uuid = data['uuid']
+						driver.save()
 				else:
-					print 'user not activated'
+					print 'User not activated'
 					res['valid'] = True
 					res['email'] = email
-					res['username'] = driver.drive_username
-					res['errors'] = "Your account is yet to be activated."
+					res['username'] = driver.username
+					res['phnum'] = driver.phone_number
+					res['status'] = driver.status
+					res['error'] = "Your account is yet to be activated."
+					if driver.uuid != data['uuid']:
+						driver.uuid = data['uuid']
+						driver.save()
 			else:
 				print 'user not found'
 				res['valid'] = False
-				res['errors'] = 'Email/Phone number and password combination did not match.'
+				res['error'] = 'Email/Phone number and password combination did not match.'
 	return JsonResponse(res)
 
 def get_active_campaigns(request):
 	res = {}
 	campaigns_details = ClientCampaignDetail.objects.filter() 
 	return JsonResponse(res)
+
+def get_active_campaings(request):
+	res = {'valid':False}
+	if request.method == 'POST':
+		if request.POST: #TODO add session check for returning the status
+			data = json.loads(request.body)
+			username = data['username']
+			uuid = data['uuid']
+			city = data['city']
+			driver = Driver.objects.get(uuid=uuid,username=username)
+			if driver is not None:
+				res['valid']=True
+				res['campaigns']={}
+				temp = []
+				cc = ClientCampaign.objects.filter(campaign_city__contains=city.lower()).values('id','client__client_name','campaign_name', 'cars_required','campaign_perimeter','campaign_city','start_date','end_date')
+				for c in cc:
+					campaign_length = c['end_date'].month - c['start_date'].month
+					c['campaign_length'] = campaign_length
+				# for c in cc:
+				# 	# ccd = ClientCampaignDetail.objects.filter(campaign=c.campaign,cars_remaining!=0)
+				# 	# ccd = ccd.values('id','daily_cap', 'daily_km_cap','daily_earning_max','daily_earning_min','cars_remaining','wrap_type')
+				# 	c = c.
+					#TODO, form a car details structure and render a page with list of campaings in the city
+					# on the next page, get_active_campaing_details show type of wraps available , permeter and getit button, also accept terms and conditions
+
+def get_campaign_detail(request):
+	res = {'valid':False}
+	if request.method == 'GET':
+		if request.GET: #TODO add session check for returning the status
+			# data = json.loads(request.body)
+			# username = data['username']
+			# uuid = data['uuid']
+			# city = data['city']
+			# campaign = data['campaignId']
+			campaign = request.GET['campaignId']
+			# driver = Driver.objects.get(uuid=uuid,username=username)
+			driver = 1
+			try:
+				if driver is not None:
+					cc = ClientCampaign.objects.filter(id = campaign).values('id','client__client_name','campaign_name', 'cars_required','campaign_perimeter','campaign_city','start_date','end_date')
+
+					campaign_length = cc[0]['end_date'].month - cc[0]['start_date'].month
+					res['campaign_length'] = campaign_length
+					print 'campaign_length',campaign_length
+					ccd = ClientCampaignDetail.objects.filter(campaign = campaign)
+					if ccd is not None and cc is not None:
+						res['valid']=True
+						daily_km_cap = 0
+						daily_earning_min = 0
+						daily_earning_max = 0
+						for cd in ccd:
+							# if cd.wrap_type == '1':
+							if daily_km_cap<cd.daily_km_cap:
+								daily_km_cap = int(cd.daily_km_cap)
+							if daily_earning_max<cd.daily_earning_max:
+								daily_earning_max = int(cd.daily_earning_max)
+							if daily_earning_min<cd.daily_earning_min:
+								daily_earning_min = int(cd.daily_earning_min)
+						res['cc']=cc
+						res['daily_km_cap']=daily_km_cap
+						res['daily_earning_max']=daily_earning_max
+						res['daily_earning_min']=daily_earning_min
+			except:
+				print traceback.format_exc()
+				pass
+
+	return render(request,'driver_templates/campaign_detail.html',{'res':res})		
+
+def get_active_campaign_details(request):
+	res = {'valid':False}
+	if request.method == 'POST':
+		if request.POST: #TODO add session check for returning the status
+			data = json.loads(request.body)
+			username = data['username']
+			uuid = data['uuid']
+			city = data['city']
+			driver = Driver.objects.get(uuid=uuid,username=username)
+			campaign = request.GET['campaignId']
+			if driver is not None:
+				res['valid']=True
+				res['campaigns']={}
+				temp = []
+				ccd = ClientCampaignDetail.objects.filter(campaign = campaignId)
+				for cd in ccd:
+					campaign_length = cd['end_date'].month - c['start_date'].month
+					cd['campaign_length'] = campaign_length
 
 
 # @csrf_protect

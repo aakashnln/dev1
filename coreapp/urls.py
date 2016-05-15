@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from . import views
 from django.views.decorators.csrf import csrf_exempt
 import coreapp.signals
+
 urlpatterns = [
 
     # url(r'^client/signup/$',views.client_create),
@@ -25,6 +26,7 @@ urlpatterns = [
     url(r'^api/register$', csrf_exempt(views.driver_register),name='Driver_register'),
     url(r'^api/login$', csrf_exempt(views.driver_login),name='Driver_login'),
 	url(r'^api/get_status$',csrf_exempt(views.get_driver_status),name='Driver_status'),
+    url(r'^api/campaign_detail$',csrf_exempt(views.get_campaign_detail),name='Campaign_Detail'),
     # Allow the URLs beginning with /captcha/ to be handled by
 	# the urls.py of captcha module from 'django-simple-captcha'
 	url(r'^captcha/', include('captcha.urls')),

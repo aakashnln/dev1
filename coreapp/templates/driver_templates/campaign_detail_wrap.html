@@ -1,0 +1,47 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html class="bg--big">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,height=device-height, initial-scale=1.0">
+    <title>Material Design Cards</title>
+    
+    <link rel="stylesheet" href="{% static "css/css/normalize.css" %}">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    
+    
+  </head>
+
+  <body>
+
+    
+<!-- Controllers-->
+<!-- <div class="controller-container"><span id="big" class="controller is_current">BIG CARD</span><span id="medium" class="controller">MEDIUM CARD</span><span id="small" class="controller">SMALL CARD</span></div> -->
+    {% if res.valid == True %}
+      {% for c in res.cc %}
+        {% if c.cars_required>0 %}
+          <!-- Cards-->
+          <div class="card card--big">
+            <div style="background-image: url(https://placeimg.com/640/480/nature)" class="card__image"></div>
+            <h2 class="card__title">c.campaign_name</h2><span class="card__subtitle">c.client__client_name</span>
+            <p class="card__text"><a href="">Explore campaign</a></p>
+            <div class="card__action-bar">
+              <button class="card__button">SHARE</button>
+              <!-- <button class="card__button">START</button> -->
+              <button class="card__button">JOIN CAMPAIGN</button>
+              <a>{{c['campaign_length']}} Months</a>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    
+<!--     <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+        <script src="js/index.js"></script> -->
+    <!-- jQuery -->
+    <script src="{% static "js/jquery.js"%} "></script>
+    
+    
+  </body>
+</html>
