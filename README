@@ -3,6 +3,6 @@ Welcome
 
 
 Steps to follow :
-1. Clone the code
+1. Clone the code pls
 2. From inside the project directory run ' python manage.py runserver' to run server in development mode
 3. To perform migrate run 'python manage.py makemigrations' and then 'python manga.py migrate' 
