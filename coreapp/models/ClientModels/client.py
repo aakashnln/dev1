@@ -85,10 +85,6 @@ class Client(AbstractBaseUser):
 		if language is not None:
 			request.session[LANGUAGE_SESSION_KEY] = language
 
-
-
-
-
 class ClientProfile(models.Model):
 	client = models.OneToOneField(Client)
 	activation_key = models.CharField(max_length=40, blank=True)
@@ -132,7 +128,7 @@ class ClientCampaign(models.Model):
 		('4', 'Closed'),
 		('5', 'Unknown'),
 		)
-	campaign_status = models.CharField(max_length=1,choices=CAMPAIGN_STATUS,default='4')
+	campaign_status = models.CharField(max_length=1,choices=CAMPAIGN_STATUS,default='1')
 	def __unicode__(self):
 		return self.campaign_name
 

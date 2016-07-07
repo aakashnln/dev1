@@ -103,7 +103,7 @@ function insertLocationM(loc){
       if(typeof loc.distance_interval == "undefined") loc.distance_interval = -1;
 
 //     var sqlParams = [loc.uuid, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading, loc.provider, loc.time_interval];
-	 db.collection('LocationLog').insert({device_uuid:loc.uuid,
+	 db.collection('location_log').insert({device_uuid:loc.uuid,
                                   trip_uuid:"1",
 	 								                gps_timestamp:loc.gps_timestamp,
                                   gps_loc:{

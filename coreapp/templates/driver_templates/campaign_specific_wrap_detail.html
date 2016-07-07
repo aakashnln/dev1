@@ -80,15 +80,15 @@ function initialize()
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-function load_wrap_details(id){
+function join_campaign_with_wrap(id,wrap_type){
     var id = id;
-    Android.load_wrap_details(id);
+    Android.join_campaign_with_wrap(id,wrap_type);
 }
 </script>    
 <!-- Controllers-->
 <!-- <div class="controller-container" style="height: 150px"><span id="big" class="controller is_current">BIG CARD</span><span id="medium" class="controller">MEDIUM CARD</span><span id="small" class="controller">SMALL CARD</span></div> -->
 {% if res.valid == True %}
-      {% for c in res.cc %}
+      {% for c in res.ccd %}
         {% if c.cars_required > 0 %}
           <!-- Cards-->
           <div class="card card--big" style="
@@ -101,8 +101,11 @@ function load_wrap_details(id){
               display: table-row;
               bottom: 10%;">
             <div style="background-image: url(https://placeimg.com/640/480/nature)" class="card__image"></div>
-            <h2 class="card__title">{{c.campaign_name}}</h2><!-- <span class="card__subtitle">By Mattia Astorino</span> -->
-            <p class="card__text" style="text-align: center;/*margin: 15px;*/">Checkout {{c.client__client_name}}</p>
+            <h2 class="card__title">{{c.get_wrap_type_display}}</h2><!-- <span class="card__subtitle">By Mattia Astorino</span> -->
+            <p class="card__text" style="text-align: center;font-size:12px/*margin: 15px;*/"><!-- Checkout {{c.client__client_name}} -->
+              Please take a review your selection<br>
+              When you tap "Join Campaign" your request will be sent to our team and we will schedule your wrap appointment.
+            </p>
             <div style="
               position: absolute;
               top: 37%;
@@ -141,7 +144,7 @@ function load_wrap_details(id){
               height: 15%;z-index: 1000">
               <button style="width: 100%;
               background: #1DE9B6;
-              height: 75%;" onclick="load_wrap_details({{c.id}});">Continue</button>
+              height: 75%;" onclick="join_campaign_with_wrap({{c.campaign_id}},{{c.wrap_type}});">Join Campaign</button>
           </div>
         {% endif %}
       {% endfor %}

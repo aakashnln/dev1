@@ -23,10 +23,18 @@ urlpatterns = [
 
     url(r'^driver/get_trip_earning/$', views.get_trip_earning,name='Client_campaign'),
 
-    url(r'^api/register$', csrf_exempt(views.driver_register),name='Driver_register'),
-    url(r'^api/login$', csrf_exempt(views.driver_login),name='Driver_login'),
-	url(r'^api/get_status$',csrf_exempt(views.get_driver_status),name='Driver_status'),
-    url(r'^api/campaign_detail$',csrf_exempt(views.get_campaign_detail),name='Campaign_Detail'),
+    url(r'^api/gen_trip_id/$', csrf_exempt(views.gen_trip_id),name='Gen_trip_id'),
+    url(r'^api/get_earning_update/$', csrf_exempt(views.get_earning_update),name='Get_earning_update'),
+    # TODO add driver confirmation link
+    # url(r'^driver/driver_confirmation/(?P<activation_key>\w+)/', views.client_confirmation),
+    url(r'^api/register/$', csrf_exempt(views.driver_register),name='Driver_register'),
+    url(r'^api/login/$', csrf_exempt(views.driver_login),name='Driver_login'),
+	url(r'^api/get_status/$',csrf_exempt(views.get_driver_status),name='Driver_status'),
+    url(r'^api/campaigns_list/$',csrf_exempt(views.get_active_campaigns),name='Campaign_List'),# shows the campaign details with maps
+    url(r'^api/campaign_detail/$',csrf_exempt(views.get_campaign_detail),name='Campaign_Detail'), # shows different available wrap types
+    url(r'^api/campaign_detail_wrap/$',csrf_exempt(views.get_active_campaign_wrap_details),name='Campaign_Detail_wrap'), # shows details of a specific wrap 
+    url(r'^api/campaign_detail_wrap_specific/$',csrf_exempt(views.get_active_campaign_specific_wrap_detail),name='Campaign_Detail_wrap'), # final page in a specific wrap
+    url(r'^api/join_campaign/$',csrf_exempt(views.campaign_join_post),name='Campaign_Detail_wrap'), # final page in a specific wrap
     # Allow the URLs beginning with /captcha/ to be handled by
 	# the urls.py of captcha module from 'django-simple-captcha'
 	url(r'^captcha/', include('captcha.urls')),
