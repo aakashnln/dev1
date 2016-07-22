@@ -154,31 +154,37 @@ def get_client(_id):
 def get_driver_status(request):
 	res = {'valid':False}
 	if request.method == 'POST':
-		# if request.POST: #TODO add session check for returning the status
-		data = json.loads(request.body)
-		email = data['email']
-		uuid = data['uuid']
-		driver = Driver.objects.get(uuid=uuid,email=email)
-		if driver is not None:
-			res['valid'] = True
-			res['status'] = driver.status
-			try:
-				# dc = DriverCampaign.objects.get(driver=driver,campaign_status='2')
-				dc = DriverCampaign.objects.filter(django_Q(driver=driver),django_Q(campaign_status='1') | django_Q(campaign_status='2'))
-				print dc
-				if dc!=None and len(dc)!=0:  # check if driver has not signed up for any campaign
-					res['status'] += dc[0].campaign_status
-					print 'YOLO',res['status']
-			except:
-				# print 'YOLO'
-				print traceback.format_exc()
-				pass
-			# res['email'] = email
-			# res['username'] = driver.drive_username
-		else:
-			print 'user not found'
+		try:
+			# if request.POST: #TODO add session check for returning the status
+			data = json.loads(request.body)
+			email = data['email']
+			uuid = data['uuid']
+			driver = Driver.objects.get(uuid=uuid,email=email)
+			if driver is not None:
+				res['valid'] = True
+				res['status'] = driver.status
+				try:
+					# dc = DriverCampaign.objects.get(driver=driver,campaign_status='2')
+					dc = DriverCampaign.objects.filter(django_Q(driver=driver),django_Q(campaign_status='1') | django_Q(campaign_status='2'))
+					print dc
+					if dc!=None and len(dc)!=0:  # check if driver has not signed up for any campaign
+						res['status'] += dc[0].campaign_status
+						print 'YOLO',res['status']
+				except:
+					# print 'YOLO'
+					print traceback.format_exc()
+					pass
+				# res['email'] = email
+				# res['username'] = driver.drive_username
+			else: # this is not going to reached as the Driver.objects.get with cause the exception to be triggered
+				print 'user not found'
+				res['valid'] = False
+				res['error'] = 'Some error occured, please try again after some time.'
+		except:
+			print traceback.format_exc()
 			res['valid'] = False
-			res['error'] = 'Some error occured, please try again after some time.'
+			res['status'] = '-1'
+			res['error'] = 'You are being logged out, please log in again'
 	return JsonResponse(res)
 
 def driver_login(request):

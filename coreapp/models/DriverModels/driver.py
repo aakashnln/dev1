@@ -14,7 +14,7 @@ class Driver(models.Model):
     phone_number = models.CharField(max_length=15,validators=[phone_regex],unique=True, blank=False) # validators should be a list
     email = models.CharField(max_length=100,unique=True,blank=False)
     password = models.CharField(max_length=200,blank=False)
-    STATUS = (
+    STATUS = ( # if driver status is -1, the driver doesn't exit
         ('1', 'New'),
         ('2', 'Verified'),
         ('3', 'Active'),
