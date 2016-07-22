@@ -85,7 +85,7 @@ def client_register(request):
 		return redirect('Client_dashboard')
 
 	if request.user.is_authenticated():
-		return redirect(home)
+		return redirect('homepage')
 
 	registration_form = RegistrationForm()
 	if request.method == 'POST':
