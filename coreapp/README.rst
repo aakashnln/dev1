@@ -32,6 +32,7 @@ markdown       # Markdown support for the browsable API.
 django-filter
 mongoengine
 django-multiselectfield
+geopy
 
 sudo apt-get install libgdal-dev
 

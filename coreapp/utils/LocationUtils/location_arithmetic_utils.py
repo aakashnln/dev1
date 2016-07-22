@@ -1,18 +1,24 @@
 import math
 import datetime
+from geopy.distance import vincenty
+
 def __init__():
 	pass
 # Haversine formula:
 def cal_polyline_dist(polyline):
 	dist = 0.0
 	p0 = polyline[0]
+	p0 = exchange_lat_long(p0)
 	for p in polyline:
-		dist += cal_dist(p,p0)
+		dist += cal_dist(exchange_lat_long(p),p0)
 		p0 = p
 	return dist
 
 def deg2rad(x):
 	return x * math.pi / 180;
+
+def exchange_lat_long(point):
+	return [point[1],point[0]]
 
 def cal_dist(point1,point2):
 	R = 6378137.0
@@ -47,7 +53,7 @@ def trip_earning(poly,trip_points,constants):
 	# trip_perimeter poly
 	# max capcapss => distance and daily earnings
 	# timestamp print datetime.datetime.fromtimestamp(int("1461420252734")/1000).strftime('%y-%m-%d %H:%M:%S.%f')
-	# have to requtrn zero earning for travel distance less than 500m
+	# have to return zero earning for travel distance less than 500m
 	earning = 0.0
 	trip_distance = 0.0
 	trip_loc_path = []
@@ -57,7 +63,8 @@ def trip_earning(poly,trip_points,constants):
 	for p in trip_points:
 		point = p.gps_loc['coordinates']
 		if is_point_in_poly(point[1],point[0],poly):
-			dist = cal_dist(trip_point1.gps_loc['coordinates'],p.gps_loc['coordinates'])
+			dist = vincenty(exchange_lat_long(point1),exchange_lat_long(point2)).km * 1000.00
+			# dist = cal_dist(trip_point1.gps_loc['coordinates'],p.gps_loc['coordinates'])
 			trip_distance += dist
 			# speed = (trip_point1.gps_speed + p.gps_speed)/2
 			speed = dist/(datetime.datetime.fromtimestamp(int(p.gps_timestamp)/1000)-datetime.datetime.fromtimestamp(int(trip_point1.gps_timestamp)/1000)).total_seconds()

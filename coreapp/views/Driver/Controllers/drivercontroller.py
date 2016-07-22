@@ -166,7 +166,7 @@ def get_driver_status(request):
 				# dc = DriverCampaign.objects.get(driver=driver,campaign_status='2')
 				dc = DriverCampaign.objects.filter(django_Q(driver=driver),django_Q(campaign_status='1') | django_Q(campaign_status='2'))
 				print dc
-				if dc!=None or dc!=[]:
+				if dc!=None or dc!=[]:  # check if driver has not signed up for any campaign
 					res['status'] += dc[0].campaign_status
 					print 'YOLO',res['status']
 			except:
