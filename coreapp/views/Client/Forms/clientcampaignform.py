@@ -10,8 +10,8 @@ from coreapp.models import *
 # Create form class for the Registration form
 class CampaignForm(forms.Form):
 	campaign_name = forms.CharField()
-	cars_required = forms.IntegerField(label='Number of cars to be deployed')
-	impression_target = forms.IntegerField(label='Impression target',required=False)
+	cars_required = forms.IntegerField(label='Number of cars to be deployed',initial=5,min_value=5)
+	impression_target = forms.IntegerField(label='Impression target',required=False,min_value=0)
 	start_date = forms.DateField(initial=datetime.date.today,widget=forms.TextInput(attrs={
 				'class':'datepicker1',
 				'data-provide':"datepicker"

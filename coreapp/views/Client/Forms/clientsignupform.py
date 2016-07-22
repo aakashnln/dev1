@@ -64,7 +64,7 @@ class RegistrationForm(forms.Form):
 
 	#Override of save method for saving both User and Profil objects
 	def save(self, datas):
-		u = Client(client_name=datas['client_name'],client_username=datas['client_username'],client_company=datas['client_company'],client_address=datas['client_address'],client_phone_number=datas['client_phone_number'],client_email=datas['client_email'],client_password=datas['client_password'],client_status=datas['client_status'])
+		u = Client(client_name=datas['client_name'],client_username=datas['client_username'],client_company=datas['client_company'],client_address=datas['client_address'],client_phone_number=datas['client_phone_number'],client_email=datas['client_email'],password=datas['client_password'],client_status=datas['client_status'])
 		u.save()
 
 		# client_profile=ClientProfile()

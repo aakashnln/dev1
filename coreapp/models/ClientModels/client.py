@@ -19,7 +19,7 @@ class Client(AbstractBaseUser):
 	phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999999'. Up to 15 digits allowed.")
 	client_phone_number = models.CharField(max_length=15,validators=[phone_regex], blank=False) # validators should be a list
 	client_email = models.CharField(max_length=100,unique=True,blank=False)
-	client_password = models.CharField(max_length=200,blank=False)
+	# password = models.CharField(max_length=200,blank=False)
 	CLIENT_STATUS = (
 		('1', 'New'),
 		('2', 'Verified'),# verified by the client
@@ -42,7 +42,7 @@ class Client(AbstractBaseUser):
 	def check_password(self, raw_password):
 		import hashlib
 		# ... get 'hsh_passwd' from database based on 'user' ...
-		hsh_passwd = self.client_password
+		hsh_passwd = self.password
 		# hsh_passwd = hsh_passwd.split('$')
 		salt = ''#hsh_passwd[1]
 		# print hsh_passwd

@@ -29,7 +29,9 @@
     <![endif]-->
     <!-- <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script> -->
-
+    {% if campaigns|length < 1 %}
+        <base target="_parent" />
+    {% endif %}
 </head>
 
 <body style="padding: 0;margin: 0;">  

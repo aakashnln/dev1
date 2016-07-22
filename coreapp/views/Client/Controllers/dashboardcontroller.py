@@ -128,10 +128,9 @@ def load_campaign_details(request, camp_id=None):
 	# campaign[0].campaign_perimeter = c
 	# print campaign[0].campaign_perimeter
 	# print c
-	print 'length',type(campaign[0].campaign_perimeter)
 	if len(campaign)<1:
 		return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':[]})
-
+	print 'length',type(campaign[0].campaign_perimeter)
 	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':campaign})
 
 	
