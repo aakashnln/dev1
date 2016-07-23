@@ -441,6 +441,7 @@ def campaign_join_post(request):
 def gen_trip_id(request):
 	res = {'valid':False}
 	if request.method == 'POST':
+		data = json.loads(request.body)
 		try:
 			if data['key'] == SECRET_KEY:
 				res['valid'] = True

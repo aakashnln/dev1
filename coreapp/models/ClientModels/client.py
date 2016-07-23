@@ -123,7 +123,7 @@ class ClientCampaign(models.Model):
 								 max_length=1,default='4')
 	CAMPAIGN_STATUS = (
 		('1', 'New'),
-		('2', 'Processing'),# verified by the client
+		('2', 'Processing'),# verified by the client, and must be shown as comming soon in the app
 		('3', 'Active'), # activated by us
 		('4', 'Closed'),
 		('5', 'Unknown'),
