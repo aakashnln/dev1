@@ -151,6 +151,9 @@ class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
+	class Meta:
+    unique_together = ('campaign', 'wrap_type',) # one campaign must have only one entry per wrap_type
+
 
 class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wrap type
 	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)

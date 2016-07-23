@@ -415,7 +415,7 @@ def campaign_join_post(request):
 
 		driver = Driver.objects.get(uuid=uuid,username=username)
 		# driver = 1
-		ccd = ClientCampaignDetail.objects.get(campaign = campaign,wrap_type=wrap_type)
+		ccd = ClientCampaignDetail.objects.get(campaign=campaign,wrap_type=wrap_type)
 		print ccd.id
 		if driver is not None and ccd is not None:
 			res['valid']=True

@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^api/campaigns_list/$',csrf_exempt(views.get_active_campaigns),name='Campaign_List'),# shows the campaign details with maps
     url(r'^api/campaign_detail/$',csrf_exempt(views.get_campaign_detail),name='Campaign_Detail'), # shows different available wrap types
     url(r'^api/campaign_detail_wrap/$',csrf_exempt(views.get_active_campaign_wrap_details),name='Campaign_Detail_wrap'), # shows details of a specific wrap 
-    url(r'^api/campaign_detail_wrap_specific/$',csrf_exempt(views.get_active_campaign_specific_wrap_detail),name='Campaign_Detail_wrap'), # final page in a specific wrap
+    url(r'^api/campaign_detail_wrap_specific/$',csrf_exempt(views.get_active_campaign_specific_wrap_detail),name='Campaign_Specific_Detail_wrap'), # final page in a specific wrap
     url(r'^api/join_campaign/$',csrf_exempt(views.campaign_join_post),name='Campaign_Detail_wrap'), # final page in a specific wrap
     # Allow the URLs beginning with /captcha/ to be handled by
 	# the urls.py of captcha module from 'django-simple-captcha'
