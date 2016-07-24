@@ -10,7 +10,7 @@ class LocationLog(Document):
 	# traffic
 	gps_timestamp = DateTimeField(required=True,default=datetime.datetime.now)
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
-	trip_uuid = LongField(required=True,auto_index=True)#a trip UUID send by app
+	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
 	campaignId = LongField(required=True,default=0)
 	campaign_detailId = LongField(required=True,default=0)
 	meta = {
@@ -21,7 +21,7 @@ class TripLog(Document):
 	device_uuid = StringField(max_length=500, required=True)
 	# timestamp = DateTimeField(required=True)
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
-	trip_uuid = LongField(required=True,auto_index=True)#a trip UUID send by app
+	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
 	campaignId = LongField(required=True,default=0)
 	trip_loc_path = LineStringField(required=True,auto_index=True)
 	trip_distance = FloatField(required=True)
