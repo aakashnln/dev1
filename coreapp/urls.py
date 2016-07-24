@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^client/dashboard/load_campaign_details/(?P<camp_id>[-\d]+)/$', views.load_campaign_details,name='dashboard_iframe'),
     url(r'^client/create/campaign/$', views.client_campaign_create,name='Client_campaign'),
 
-    url(r'^driver/get_trip_earning/$', views.get_trip_earning,name='Client_campaign'),
+    url(r'^driver/get_trip_earning/$', views.get_trip_earning,name='Trip_stop'),
 
     url(r'^api/gen_trip_id/$', csrf_exempt(views.gen_trip_id),name='Gen_trip_id'),
     url(r'^api/get_earning_update/$', csrf_exempt(views.get_earning_update),name='Get_earning_update'),

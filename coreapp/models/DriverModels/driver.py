@@ -117,6 +117,9 @@ class DriverCampaign(models.Model):
             self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
         return super(DriverCampaign, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.driver.email
     
 class DriverDailyEarning(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
