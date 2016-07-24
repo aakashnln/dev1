@@ -11,7 +11,7 @@ class LocationLog(Document):
 	gps_timestamp = DateTimeField(required=True,default=datetime.datetime.now)
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
 	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
-	campaignId = LongField(required=True,default=0)
+	campaign_id = LongField(required=True,default=0)
 	# campaign_detailId = LongField(required=True,default=0)
 	meta = {
 		'indexes': [[("gps_loc", "2dsphere"), ("created_at", 1)]]
@@ -22,7 +22,7 @@ class TripLog(Document):
 	# timestamp = DateTimeField(required=True)
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
 	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
-	campaignId = LongField(required=True,default=0)
+	campaign_id = LongField(required=True,default=0)
 	trip_loc_path = LineStringField(required=True,auto_index=True)
 	trip_distance = FloatField(required=True)
 	created_at = DateTimeField()
