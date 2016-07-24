@@ -169,6 +169,7 @@ def get_driver_status(request):
 					print dc
 					if dc!=None and len(dc)!=0:  # check if driver has not signed up for any campaign
 						res['status'] += dc[0].campaign_status
+						print res['campaignId']
 						if dc[0].campaign_status == 2:
 							res['campaignId'] = dc[0].campaign
 						print 'YOLO',res['status']
