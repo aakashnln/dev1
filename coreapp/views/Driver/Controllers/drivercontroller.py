@@ -534,7 +534,7 @@ def get_trip_earning(request):
 
 			poly = campaign.campaign_perimeter
 
-			campaign_detail = ClientCampaignDetail.objects.get(id = trip_points[0].campaign_detailId)
+			campaign_detail = ClientCampaignDetail.objects.get(campaign = campaign)#trip_points[0].campaign_detailId)
 
 			campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
 			

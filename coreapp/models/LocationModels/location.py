@@ -12,7 +12,7 @@ class LocationLog(Document):
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
 	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
 	campaignId = LongField(required=True,default=0)
-	campaign_detailId = LongField(required=True,default=0)
+	# campaign_detailId = LongField(required=True,default=0)
 	meta = {
 		'indexes': [[("gps_loc", "2dsphere"), ("created_at", 1)]]
 	}
