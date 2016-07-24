@@ -478,7 +478,7 @@ def get_earning_update(request): # Working here................
 
 	return JsonResponse(res)
 
-# Make this work with stoptrip in android and then make get earning method work
+# @csrf_protect Make this work with stoptrip in android and then make get earning method work
 def get_trip_earning(request):
 	res = {'valid':False}
 	if request.method == 'POST':
