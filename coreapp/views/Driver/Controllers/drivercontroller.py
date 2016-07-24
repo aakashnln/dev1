@@ -519,7 +519,7 @@ def get_trip_earning(request):
 
 			trip_points = LocationLog.objects.filter(device_uuid=uuid,trip_uuid=tripId)
 
-			print trip_points[0],trip_points[0]['campaignId']
+			print trip_points[0],trip_points[0]['campaign_id'] # trip_points comes from mongo, so look out for spelling cases
 
 			if len(trip_points)<2:
 				res['error']='Trip to short'
