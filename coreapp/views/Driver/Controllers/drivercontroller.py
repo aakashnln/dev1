@@ -169,6 +169,8 @@ def get_driver_status(request):
 					print dc
 					if dc!=None and len(dc)!=0:  # check if driver has not signed up for any campaign
 						res['status'] += dc[0].campaign_status
+						if dc[0].campaign_status == 2:
+							res['campaignId'] = dc[0].campaign
 						print 'YOLO',res['status']
 				except:
 					# print 'YOLO'
@@ -442,7 +444,7 @@ def gen_trip_id(request):
 	res = {'valid':False}
 	if request.method == 'POST':
 		data = json.loads(request.body)
-		try:
+		try: #TODO validate for uuid and campaignId
 			if data['key'] == SECRET_KEY:
 				res['valid'] = True
 				res['trip_id'] = str(uuid.uuid4())
@@ -475,89 +477,209 @@ def get_earning_update(request): # Working here................
 
 	return JsonResponse(res)
 
-# @csrf_protect
+# @csrf_protect Make this work with stoptrip in android and then make get earning method work
 def get_trip_earning(request):
-	if 'uuid' not in request.GET.keys():
-		return JsonResponse({'error':'unknown device'})
+	res = {'valid':False}
+	if request.method == 'POST':
+		data = json.loads(request.body)
+		if 'uuid' not in data.keys():
+			res['error']='unknown device'
+			return JsonResponse(res)
+		if 'campaignId' not in data.keys():
+			res['error']='unknown campaign'
+			return JsonResponse(res)
+		if 'tripId' not in data.keys():
+			res['error']='unknown trip'
+			return JsonResponse(res)
 
-	driver = Driver.objects.filter(id=request.GET['uuid'])	
-	if driver == []:
-		return JsonResponse({'error':'unknown driver'})
-	print driver
-	driver = driver[0] # get the driver
+		try:
+			uuid = data['uuid']
+			tripId = data['tripId']
+			campaignId = data['campaingId']
 
-	print 'Trip earnings requested'
-	# trip_id = request.GET['trip_id']
-	uuid = request.GET['uuid']
-	trip_points = LocationLog.objects.filter(device_uuid='6889cee8-4039-3c41-9995-1f7048d646c5',campaignId=campaignId)
-	if len(trip_points)<2:
-		return JsonResponse({'error':'Trip to short'})
+			driver = Driver.objects.filter(id=uuid)	
+			if driver == None or len(driver)!=0:
+				res['error']='unknown driver'
+				return JsonResponse(res)
+
+			print driver
+			driver = driver[0] # get the driver
+
+			print 'Trip earnings requested'
+			# trip_id = request.GET['trip_id']
+
+			dc = DriverCampaign.objects.filter(driver=driver,campaign_status='2')
+			print dc
+			if len(dc)==0 or len(dc)>1:
+				res['error']='No or more than one active campaigns'
+				return JsonResponse(res)
+
+			# campaignId = dc[0].campaign_detail.campaign #TODO test weather this line of code works
+
+			trip_points = LocationLog.objects.filter(device_uuid=uuid,trip_uuid=tripId)
+
+			if len(trip_points)<2:
+				res['error']='Trip to short'
+				return JsonResponse(res)
+			
+			campaign = ClientCampaign.objects.get(id = trip_points[0].campaignId)
+			polyline = []
+			for point in trip_points:
+				polyline.append(point.gps_loc['coordinates'])
+
+			print utils.cal_polyline_dist(polyline)
+
+			poly = campaign.campaign_perimeter
+
+			campaign_detail = ClientCampaignDetail.objects.get(id = trip_points[0].campaign_detailId)
+
+			campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
+			
+			daily_cap = campaign_detail.daily_cap
+			daily_km_cap = campaign_detail.daily_km_cap
+
+			trip_dict = trip_earning(poly,trip_points,{})
+
+			if trip_dict == 0.0:
+				res['error']='Trip to short'
+				return JsonResponse(res)
+
+			# code to update the daily earnings 
+			try:
+				dde = DriverDailyEarning.objects.get(driver=driver,create_at__date = datetime.date.today())
+
+				if float(dde.total_trip_earning)+trip_dict['earning']>=daily_cap:
+					trip_dict['earning'] = daily_cap
+					km_cap = True
+				else:
+					trip_dict['earning'] = float(dde.total_trip_earning)+trip_dict['earning']
+					km_cap = False
+
+				if float(dde.total_trip_distance)+trip_dict['trip_distance']>=daily_km_cap:
+					trip_dict['trip_distance'] = daily_km_cap
+					km_cap = True
+				else:
+					trip_dict['trip_distance'] = float(dde.total_trip_distance)+trip_dict['trip_distance']
+					km_cap = False
+
+				dde.update(total_trip_earning = trip_dict['earning'],trip_count = F('trip_count') + 1,total_trip_distance = trip_dict['trip_distance'])
+				dde.save()
+			except:
+				if trip_dict['earning']>=daily_cap:
+					trip_dict['earning'] = daily_cap
+					km_cap = True
+				else:
+					km_cap = False
+
+				if trip_dict['trip_distance']>=daily_km_cap:
+					trip_dict['trip_distance'] = daily_km_cap
+					km_cap = True
+				else:
+					km_cap = False
+
+				dde = DriverDailyEarning(driver=driver,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
+				dde.save()
+
+			tp = TripLog(device_uuid=trip_points[0].device_uuid, userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])
+			tp.save()
+			
+			#TODO optimise the above by creating async tasks and sending user a simple response saying completed or somthing like that
+
+			coreapp.signal.update_dashboad(sender='TripLog', request=request,trip_points=trip_points,trip_dict=trip_dict)
+
+			# envoke async task to update client dashboard data
+			update_dashboard(request,driver,campaign_detail,trip_points,trip_dict).delay()
+			res['valid']=True
+			res['earnings']=trip_dict
+			res['flags']={'km_cap':km_cap,'earning_cap':earning_cap}
+		except:
+			print traceback.format_exc()
+			res['error'] = "Error updating earning, please contact coustmer support"
+	return JsonResponse(res)
+
+
+
+# def get_trip_earning(request):
+# 	if 'uuid' not in request.GET.keys():
+# 		return JsonResponse({'error':'unknown device'})
+
+# 	driver = Driver.objects.filter(id=request.GET['uuid'])	
+# 	if driver == []:
+# 		return JsonResponse({'error':'unknown driver'})
+# 	print driver
+# 	driver = driver[0] # get the driver
+
+# 	print 'Trip earnings requested'
+# 	# trip_id = request.GET['trip_id']
+# 	uuid = request.GET['uuid']
+# 	trip_points = LocationLog.objects.filter(device_uuid='6889cee8-4039-3c41-9995-1f7048d646c5',campaignId=campaignId)
+# 	if len(trip_points)<2:
+# 		return JsonResponse({'error':'Trip to short'})
 	
-	campaign = ClientCampaign.objects.get(id = trip_points[0].campaignId)
-	polyline = []
-	for point in trip_points:
-		polyline.append(point.gps_loc['coordinates'])
+# 	campaign = ClientCampaign.objects.get(id = trip_points[0].campaignId)
+# 	polyline = []
+# 	for point in trip_points:
+# 		polyline.append(point.gps_loc['coordinates'])
 
-	print utils.cal_polyline_dist(polyline)
+# 	print utils.cal_polyline_dist(polyline)
 
-	poly = campaign.campaign_perimeter
+# 	poly = campaign.campaign_perimeter
 
-	campaign_detail = ClientCampaignDetail.objects.get(id = trip_points[0].campaign_detailId)
+# 	campaign_detail = ClientCampaignDetail.objects.get(id = trip_points[0].campaign_detailId)
 
-	campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
+# 	campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
 	
-	daily_cap = campaign_detail.daily_cap
-	daily_km_cap = campaign_detail.daily_km_cap
+# 	daily_cap = campaign_detail.daily_cap
+# 	daily_km_cap = campaign_detail.daily_km_cap
 
-	trip_dict = trip_earning(poly,trip_points,{})
+# 	trip_dict = trip_earning(poly,trip_points,{})
 
-	if trip_dict == 0.0:
-		return JsonResponse({'error':'Trip to short'})
+# 	if trip_dict == 0.0:
+# 		return JsonResponse({'error':'Trip to short'})
 
-	# code to update the daily earnings 
-	try:
-		dde = DriverDailyEarning.objects.get(driver=driver,create_at__date = datetime.date.today())
+# 	# code to update the daily earnings 
+# 	try:
+# 		dde = DriverDailyEarning.objects.get(driver=driver,create_at__date = datetime.date.today())
 
-		if float(dde.total_trip_earning)+trip_dict['earning']>=daily_cap:
-			trip_dict['earning'] = daily_cap
-			km_cap = True
-		else:
-			trip_dict['earning'] = float(dde.total_trip_earning)+trip_dict['earning']
-			km_cap = False
+# 		if float(dde.total_trip_earning)+trip_dict['earning']>=daily_cap:
+# 			trip_dict['earning'] = daily_cap
+# 			km_cap = True
+# 		else:
+# 			trip_dict['earning'] = float(dde.total_trip_earning)+trip_dict['earning']
+# 			km_cap = False
 
-		if float(dde.total_trip_distance)+trip_dict['trip_distance']>=daily_km_cap:
-			trip_dict['trip_distance'] = daily_km_cap
-			km_cap = True
-		else:
-			trip_dict['trip_distance'] = float(dde.total_trip_distance)+trip_dict['trip_distance']
-			km_cap = False
+# 		if float(dde.total_trip_distance)+trip_dict['trip_distance']>=daily_km_cap:
+# 			trip_dict['trip_distance'] = daily_km_cap
+# 			km_cap = True
+# 		else:
+# 			trip_dict['trip_distance'] = float(dde.total_trip_distance)+trip_dict['trip_distance']
+# 			km_cap = False
 
-		dde.update(total_trip_earning = trip_dict['earning'],trip_count = F('trip_count') + 1,total_trip_distance = trip_dict['trip_distance'])
-		dde.save()
-	except:
-		if trip_dict['earning']>=daily_cap:
-			trip_dict['earning'] = daily_cap
-			km_cap = True
-		else:
-			km_cap = False
+# 		dde.update(total_trip_earning = trip_dict['earning'],trip_count = F('trip_count') + 1,total_trip_distance = trip_dict['trip_distance'])
+# 		dde.save()
+# 	except:
+# 		if trip_dict['earning']>=daily_cap:
+# 			trip_dict['earning'] = daily_cap
+# 			km_cap = True
+# 		else:
+# 			km_cap = False
 
-		if trip_dict['trip_distance']>=daily_km_cap:
-			trip_dict['trip_distance'] = daily_km_cap
-			km_cap = True
-		else:
-			km_cap = False
+# 		if trip_dict['trip_distance']>=daily_km_cap:
+# 			trip_dict['trip_distance'] = daily_km_cap
+# 			km_cap = True
+# 		else:
+# 			km_cap = False
 
-		dde = DriverDailyEarning(driver=driver,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
-		dde.save()
+# 		dde = DriverDailyEarning(driver=driver,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
+# 		dde.save()
 
-	tp = TripLog(device_uuid=trip_points[0].device_uuid, userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])
-	tp.save()
+# 	tp = TripLog(device_uuid=trip_points[0].device_uuid, userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])
+# 	tp.save()
 	
-	#TODO optimise the above by creating async tasks and sending user a simple response saying completed or somthing like that
+# 	#TODO optimise the above by creating async tasks and sending user a simple response saying completed or somthing like that
 
-	coreapp.signal.update_dashboad(sender='TripLog', request=request,trip_points=trip_points,trip_dict=trip_dict)
+# 	coreapp.signal.update_dashboad(sender='TripLog', request=request,trip_points=trip_points,trip_dict=trip_dict)
 
-	# envoke async task to update client dashboard data
-	update_dashboard(request,driver,campaign_detail,trip_points,trip_dict).delay()
-	return JsonResponse({'earnings':trip_dict,
-	flags:{'km_cap':km_cap,'earning_cap':earning_cap}})
+# 	# envoke async task to update client dashboard data
+# 	update_dashboard(request,driver,campaign_detail,trip_points,trip_dict).delay()
+# 	return JsonResponse({'earnings':trip_dict,flags:{'km_cap':km_cap,'earning_cap':earning_cap}})
