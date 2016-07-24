@@ -104,7 +104,7 @@ function insertLocationM(loc){
 
 //     var sqlParams = [loc.uuid, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading, loc.provider, loc.time_interval];
 	 db.collection('location_log').insert({device_uuid:loc.uuid,
-                                  trip_uuid:"1",
+                                  trip_uuid:loc.trip_id//"1",
 	 								                gps_timestamp:loc.gps_timestamp,
                                   gps_loc:{
                                     "type": "Point",
