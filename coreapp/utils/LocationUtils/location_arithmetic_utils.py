@@ -10,7 +10,7 @@ def cal_polyline_dist(polyline):
 	p0 = polyline[0]
 	p0 = exchange_lat_long(p0)
 	for p in polyline:
-		dist += float(vincenty(exchange_lat_long(p),p0))
+		dist += float(vincenty(exchange_lat_long(p),p0).m)
 		p0 = p
 	return dist
 

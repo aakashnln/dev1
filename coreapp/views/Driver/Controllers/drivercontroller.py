@@ -530,7 +530,7 @@ def get_trip_earning(request):
 			for point in trip_points:
 				polyline.append(point.gps_loc['coordinates'])
 
-			print utils.cal_polyline_dist(polyline)
+			print 'polyline_dist',utils.cal_polyline_dist(polyline)
 
 			poly = campaign.campaign_perimeter
 
