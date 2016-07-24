@@ -499,7 +499,7 @@ def get_trip_earning(request):
 			campaignId = data['campaignId']
 
 			driver = Driver.objects.filter(uuid=uuid)	
-			if driver == None or len(driver)!=0:
+			if driver == None or len(driver)==0:
 				res['error']='unknown driver'
 				return JsonResponse(res)
 
