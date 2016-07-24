@@ -525,7 +525,7 @@ def get_trip_earning(request):
 				res['error']='Trip to short'
 				return JsonResponse(res)
 			
-			campaign = ClientCampaign.objects.get(id = trip_points[0].campaignId)
+			campaign = ClientCampaign.objects.get(id = trip_points[0]['campaignId'])
 			polyline = []
 			for point in trip_points:
 				polyline.append(point.gps_loc['coordinates'])
