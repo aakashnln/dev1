@@ -496,7 +496,7 @@ def get_trip_earning(request):
 		try:
 			uuid = data['uuid']
 			tripId = data['tripId']
-			campaignId = data['campaingId']
+			campaignId = data['campaignId']
 
 			driver = Driver.objects.filter(id=uuid)	
 			if driver == None or len(driver)!=0:
