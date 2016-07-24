@@ -519,6 +519,8 @@ def get_trip_earning(request):
 
 			trip_points = LocationLog.objects.filter(device_uuid=uuid,trip_uuid=tripId)
 
+			print trip_points
+			
 			if len(trip_points)<2:
 				res['error']='Trip to short'
 				return JsonResponse(res)
