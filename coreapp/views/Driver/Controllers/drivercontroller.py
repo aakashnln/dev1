@@ -535,7 +535,7 @@ def get_trip_earning(request):
 
 			poly = campaign_detail.campaign.campaign_perimeter
 			print poly
-			poly = json.loads(poly)
+			poly = json.loads('['+poly+']') # adding missing '[',']'s
 			# campaign_detail = ClientCampaignDetail.objects.get(campaign = campaignDetailId)#trip_points[0].campaign_detailId)
 
 			# campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
