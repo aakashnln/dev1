@@ -171,7 +171,7 @@ def get_driver_status(request):
 						res['status'] += dc[0].campaign_status
 						# print dc[0].campaign_detail.campaign.id
 						if dc[0].campaign_status == '2':
-							res['campaignId'] = dc[0].campaign_detail.campaign.id
+							res['campaignDetailId'] = dc[0].campaign_detail.id
 						print 'YOLO',res
 				except:
 					# print 'YOLO'
@@ -496,7 +496,7 @@ def get_trip_earning(request):
 		try:
 			uuid = data['uuid']
 			tripId = data['tripId']
-			campaignId = data['campaignId']
+			campaignDetailId = data['campaignId'] # holds the campaign detial ID 
 
 			driver = Driver.objects.filter(uuid=uuid)	
 			if driver == None or len(driver)==0:
@@ -525,7 +525,8 @@ def get_trip_earning(request):
 				res['error']='Trip to short'
 				return JsonResponse(res)
 			
-			campaign = ClientCampaign.objects.get(id = trip_points[0]['campaign_id'])
+			# get the specific campaign details data
+			campaign_detail = ClientCampaignDetail.objects.get(id = trip_points[0]['campaign_id'])
 			polyline = []
 			for point in trip_points:
 				polyline.append(point.gps_loc['coordinates'])
@@ -534,7 +535,7 @@ def get_trip_earning(request):
 
 			poly = campaign.campaign_perimeter
 
-			campaign_detail = ClientCampaignDetail.objects.get(campaign = campaign)#trip_points[0].campaign_detailId)
+			campaign_detail = ClientCampaignDetail.objects.get(campaign = campaignDetailId)#trip_points[0].campaign_detailId)
 
 			campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
 			
