@@ -533,8 +533,9 @@ def get_trip_earning(request):
 
 			print 'polyline_dist',utils.cal_polyline_dist(polyline)
 
-			poly = json.loads(campaign_detail.campaign.campaign_perimeter)
-
+			poly = campaign_detail.campaign.campaign_perimeter
+			print poly
+			poly = json.loads(poly)
 			# campaign_detail = ClientCampaignDetail.objects.get(campaign = campaignDetailId)#trip_points[0].campaign_detailId)
 
 			# campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
