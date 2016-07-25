@@ -59,6 +59,7 @@ def trip_earning(poly,trip_points,constants):
 	if len(trip_points)<2:
 		return 0.0
 	trip_point1 = trip_points[0]
+	dist = 0.0
 	for p in trip_points:
 		point = p.gps_loc['coordinates']
 		if is_point_in_poly(point[1],point[0],poly):
