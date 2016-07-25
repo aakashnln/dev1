@@ -32,7 +32,6 @@ def cal_dist(point1,point2):
 def is_point_in_poly(x,y,poly):
 	n = len(poly)
 	inside = False
-
 	p1x,p1y = poly[0]
 	for i in range(n+1):
 		p2x,p2y = poly[i % n]
