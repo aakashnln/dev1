@@ -33,6 +33,7 @@ django-filter
 mongoengine
 django-multiselectfield
 geopy
+python-dateutil
 
 sudo apt-get install libgdal-dev
 
