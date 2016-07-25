@@ -119,8 +119,7 @@ class ClientCampaign(models.Model):
 		('3', 'Panel'), # only doors
 		('4', 'Unknown'), # not defined
 		)
-	wrap_type = MultiSelectField(choices=WRAP_TYPES,max_choices=3,
-								 max_length=1,default='4')
+	wrap_type = MultiSelectField(choices=WRAP_TYPES,max_choices=3,default='4')
 	CAMPAIGN_STATUS = (
 		('1', 'New'),
 		('2', 'Processing'),# verified by the client, and must be shown as comming soon in the app
