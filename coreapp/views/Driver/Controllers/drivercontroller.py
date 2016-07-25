@@ -537,12 +537,12 @@ def get_trip_earning(request):
 
 			# campaign_detail = ClientCampaignDetail.objects.get(campaign = campaignDetailId)#trip_points[0].campaign_detailId)
 
-			campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
+			# campaign = DriverCampaign.objects.get(driver=driver,campaign_detail=campaign_detail)
 			
 			daily_cap = campaign_detail.daily_cap
 			daily_km_cap = campaign_detail.daily_km_cap
 
-			trip_dict = trip_earning(poly,trip_points,{})
+			trip_dict = utils.trip_earning(poly,trip_points,{})
 
 			#trip_dict structure => {'earning':earning,'trip_distance':trip_distance,'trip_loc_path':trip_loc_path}
 
