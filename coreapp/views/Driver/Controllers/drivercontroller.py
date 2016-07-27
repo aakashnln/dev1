@@ -388,6 +388,8 @@ def campaign_join_post(request):
 			if ccd.cars_required>=1:
 				# dc = DriverCampaign.objects.fil TODO avoid multiple requests
 				# register a request for campaign by driver
+				# dc = DriverCampaign.objects.filter(django_Q(driver=driver),django_Q(campaign_status='1') | django_Q(campaign_status='2'))
+				# if 
 				dc = DriverCampaign(driver=driver,campaign_detail=ccd,campaign_status=1)
 				dc.save()
 				res['message']='Congratulations, your request to join campaign has been submitted, we will short schedule a appointment for you!'
