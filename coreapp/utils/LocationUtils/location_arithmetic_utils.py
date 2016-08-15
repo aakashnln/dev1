@@ -67,8 +67,9 @@ def trip_earning(poly,trip_points,constants):
 			# dist = cal_dist(trip_point1.gps_loc['coordinates'],p.gps_loc['coordinates'])
 			trip_distance += dist
 			# speed = (trip_point1.gps_speed + p.gps_speed)/2
-			if trip_distance!=p:
-				speed = dist/(datetime.datetime.fromtimestamp(int(p.gps_timestamp)/1000)-datetime.datetime.fromtimestamp(int(trip_point1.gps_timestamp)/1000)).total_seconds()
+			dt = (datetime.datetime.fromtimestamp(int(p.gps_timestamp)/1000)-datetime.datetime.fromtimestamp(int(trip_point1.gps_timestamp)/1000)).total_seconds()
+			if trip_distance!=p and dt!=0.0:
+				speed = dist/dt
 				earning += dist/(speed+1)
 				trip_loc_path.append(p.gps_loc['coordinates'])
 
