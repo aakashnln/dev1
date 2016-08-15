@@ -63,7 +63,7 @@ def trip_earning(poly,trip_points,constants):
 	for p in trip_points:
 		point = p.gps_loc['coordinates']
 		if is_point_in_poly(point[1],point[0],poly):
-			dist = vincenty(exchange_lat_long(point1),exchange_lat_long(point2)).km * 1000.00
+			dist = vincenty(exchange_lat_long(trip_point1),exchange_lat_long(point2)).km * 1000.00
 			# dist = cal_dist(trip_point1.gps_loc['coordinates'],p.gps_loc['coordinates'])
 			trip_distance += dist
 			# speed = (trip_point1.gps_speed + p.gps_speed)/2
