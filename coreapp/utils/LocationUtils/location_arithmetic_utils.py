@@ -8,9 +8,9 @@ def __init__():
 def cal_polyline_dist(polyline):
 	dist = 0.0
 	p0 = polyline[0]
-	p0 = exchange_lat_long(p0)
+	# p0 = exchange_lat_long(p0)
 	for p in polyline:
-		dist += float(vincenty(exchange_lat_long(p),p0).m)
+		dist += float(vincenty(p,p0).m)
 		p0 = p
 	return dist
 

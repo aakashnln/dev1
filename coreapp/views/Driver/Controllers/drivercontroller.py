@@ -575,6 +575,7 @@ def get_trip_earning(request):
 				dde.update(total_trip_earning = trip_dict['earning'],trip_count = F('trip_count') + 1,total_trip_distance = trip_dict['trip_distance'])
 				dde.save()
 			except:
+				print traceback.format_exc()
 				if trip_dict['earning']>=daily_cap:
 					trip_dict['earning'] = daily_cap
 					km_cap = True
