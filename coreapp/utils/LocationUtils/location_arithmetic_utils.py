@@ -73,7 +73,7 @@ def trip_earning(poly,trip_points,constants):
 				if speed<0.0:
 					print 'speed',speed
 				if dt<0.0:
-                    print 'DT',dt
+					print 'DT',dt
 				if dist<0.0:
 					print 'dist',dist
 				earning += dist/(speed+1)
