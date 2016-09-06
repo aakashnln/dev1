@@ -131,6 +131,14 @@ def load_campaign_details(request, camp_id=None):
 	if len(campaign)<1:
 		return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':[]})
 	print 'length',type(campaign[0].campaign_perimeter)
+	# data being populated here are:
+	# total impressions
+	# total km
+	# total drivers on road
+	total_impressions =
+	total_km = 
+	total_drivers = 
+
 	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':campaign})
 
 	

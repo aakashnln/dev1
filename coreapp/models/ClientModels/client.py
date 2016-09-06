@@ -157,7 +157,7 @@ class ClientCampaignDetail(models.Model): # can be multiple , one per wrap type
 class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wrap type
 	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)
 	campaign_detail = models.OneToOneField(ClientCampaignDetail, on_delete=models.CASCADE)
-	daily_driver_on_road = models.IntegerField(blank=False,default=0.0)
+	daily_driver_on_road = models.IntegerField(blank=False,default=0.0) # total number of drivers who have been wrapped and have made earning today
 	daily_total_distance_km = models.FloatField(blank=False,default=0.0)
 	daily_total_impressions = models.FloatField(blank=False,default=0.0)
 	daily_total_cost = models.FloatField(blank=False,default=0.0)
@@ -176,7 +176,7 @@ class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wr
 class ClientCampaignDashboard(models.Model): # can be multiple , one per wrap type
 	campaign = models.ForeignKey(ClientCampaign, on_delete=models.CASCADE)
 	campaign_detail = models.OneToOneField(ClientCampaignDetail, on_delete=models.CASCADE)
-	driver_on_road = models.IntegerField(blank=False,default=0.0)
+	driver_on_road = models.IntegerField(blank=False,default=0.0) # total number of drivers who have been wrapped
 	total_distance_km = models.FloatField(blank=False,default=0.0)
 	total_impressions = models.FloatField(blank=False,default=0.0)
 	total_cost = models.FloatField(blank=False,default=0.0)

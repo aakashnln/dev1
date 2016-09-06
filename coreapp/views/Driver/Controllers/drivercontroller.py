@@ -554,7 +554,7 @@ def get_trip_earning(request):
 				res['error']='Trip too short'
 				return JsonResponse(res)
 
-			# code to update the daily earnings 
+			# code to update the drivers daily earnings, this is done realtime, to avoid and loss 
 			try:
 				dde = DriverDailyEarning.objects.get(driver=driver,create_at__date = datetime.date.today())
 
@@ -591,7 +591,7 @@ def get_trip_earning(request):
 				dde = DriverDailyEarning(driver=driver,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
 				dde.save()
 
-			tp = TripLog(device_uuid=trip_points[0].device_uuid, userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])
+			tp = TripLog(device_uuid=trip_points[0].device_uuid,userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])
 			tp.save()
 			
 			#TODO optimise the above by creating async tasks rabbitmq and sending user a simple response saying completed or somthing like that
@@ -599,7 +599,8 @@ def get_trip_earning(request):
 			coreapp.signal.update_dashboad(sender='TripLog', request=request,trip_points=trip_points,trip_dict=trip_dict)
 
 			# envoke async task (rabbitmq) to update client dashboard data
-			update_dashboard(request,driver,campaign_detail,trip_points,trip_dict).delay()
+			update_dashboard(request,driver,campaign_detail,trip_points[0].trip_uuid,trip_points,trip_dict).delay()
+			
 			res['valid']=True
 			res['earnings']=trip_dict
 			res['flags']={'km_cap':km_cap,'earning_cap':earning_cap}
