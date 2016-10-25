@@ -14,11 +14,11 @@ def update_dashboard(request,driver,campaign_detail,trip_uuid,trip_points,trip_d
 	impressions = 0
 	if driver.driver_vehicle_type == 1:
 		if campaign_detail.wrap_type == 1 :
-			impressions = trip_dict['trip_distance']+3.5
+			impressions = trip_dict['trip_distance']*3.5
 	elif driver.driver_vehicle_type == 2:
-		impressions = trip_dict['trip_distance']+4.5
+		impressions = trip_dict['trip_distance']*4.5
 	elif driver.driver_vehicle_type == 3:
-		impressions = trip_dict['trip_distance']+5
+		impressions = trip_dict['trip_distance']*5
 
 	# save trips impressions in TripLog
 	tl = TripLog(trip_uuid=trip_uuid)
@@ -36,19 +36,18 @@ def update_dashboard(request,driver,campaign_detail,trip_uuid,trip_points,trip_d
 		ccdd = ClientCampaignDailyDashboard.objects.get(campaign_detail=campaign_detail)
 		ccdd.update(daily_total_impressions = F('daily_total_impressions')+impressions,
 					daily_total_distance_km = F('daily_total_distance_km')+trip_dict['trip_distance'],
-					daily_driver_on_road = driver_on_road,
+					daily_driver_on_road = drivers_on_road,
 					daily_total_cost = F('daily_total_cost')+trip_dict['earning']*2.0
 					)
 		ccdd.save()
 	except:
 		ccdd = ClientCampaignDailyDashboard(campaign = campaign_detail.campaign,
 									campaign_detail = campaign_detail,
-									daily_driver_on_road = driver_on_road,
+									daily_driver_on_road = drivers_on_road,
 									daily_total_distance_km = total_distance_km,
 									daily_total_impressions = impressions,
 									daily_total_cost = trip_dict['earning']*2.0,#1000000.00, #get the cost function here
 									wrap_type = campaign_detail.wrap_type
-									# was here last
 									)
 	try:
 		# updating the Client Campaing dashboard count
@@ -56,7 +55,7 @@ def update_dashboard(request,driver,campaign_detail,trip_uuid,trip_points,trip_d
 		ccd = ClientCampaignDashboard.objects.get(campaign_detail=campaign_detail)
 		ccd.update(total_impressions = F('total_impressions')+impressions,
 					total_distance_km = F('total_distance_km')+trip_dict['trip_distance'],
-					driver_on_road = driver_on_road,
+					driver_on_road = drivers_on_road,
 					total_cost = F('total_cost')+trip_dict['earning']*2.0
 					)
 		ccd.save()
@@ -68,9 +67,7 @@ def update_dashboard(request,driver,campaign_detail,trip_uuid,trip_points,trip_d
 									total_impressions = impressions,
 									total_cost = trip_dict['earning']*2.0,#1000000.00, #get the cost function here
 									wrap_type = campaign_detail.wrap_type
-									# was here last
 									)
-
 	return
 
 @shared_task

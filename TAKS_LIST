@@ -1,3 +1,5 @@
 1. Update the UI to show client dashboard with imporessions
 2. Create the algorithm to calculate impressions
 3. Create algorithm to calculate earnings , one thing can be driver earning = impressions * some fixed amount, client cost = earning * 2.0
+4. Get Better UI done
+5. 

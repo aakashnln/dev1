@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import F,Sum
 # Create your views here.
 
 # class ClientController(object):
@@ -116,11 +117,19 @@ def client_dashboard(request):
 	return render(request,'dashboard/dashboard2.html',{'client':client,'title':"DUA Dashboard",'campaigns':campaigns,'default_camp_id':default_camp_id})
 
 def load_campaign_details(request, camp_id=None):
+
 	if not is_logged_in(request):
 		# print 'redirect to login',request.user
 		return redirect('Client_login')
 	client = Client.objects.get(id=request.session['client_id'])
 	campaign = ClientCampaign.objects.filter(client=client,id=camp_id)
+	if len(campaign)<1:
+		return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':[]})
+
+	# getting the list of campaign details enteries
+	campaign_details = [i.id for i in ClientCampaignDetails.objects.filter(campaign = camp_id)]
+	# the map related parameter parsing happens on the client side
+	# next TODO creating data for showing the routes of the driver 
 	# for c in [campaign[0].campaign_perimeter]:
 	# c = campaign[0].campaign_perimeter
 	# c = c.replace('(','[')
@@ -128,17 +137,29 @@ def load_campaign_details(request, camp_id=None):
 	# campaign[0].campaign_perimeter = c
 	# print campaign[0].campaign_perimeter
 	# print c
-	if len(campaign)<1:
-		return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':[]})
-	print 'length',type(campaign[0].campaign_perimeter)
+	
 	# data being populated here are:
+	campaign_metrics = ClientCampaignDashboard.objects.filter(campaign=camp_id).aggregate(total_impressions=Sum('total_imporessions'),total_distance_km=Sum('total_distance_km'),driver_on_road=Sum('driver_on_road'),total_cost=Sum('total_cost'))
+	#,Sum(F('price')/F('pages'), output_field=FloatField()))
+
 	# total impressions
 	# total km
-	# total drivers on road
-	total_impressions =
-	total_km = 
-	total_drivers = 
+	# total drivers allocated, 
+	# drives on road this must be realtime one road, where the driver has logged in even once in this day
+	# total_impressions = campaign.total_impressions
+	# total_km = campaign.total_km
+	# total_drivers = campaign.cars_on_road
+	# daily_total_cost = campaign.daily_total_cost
 
-	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaigns':campaign})
+	# drivers_today = DriverDailyEarning.objects.filter(campaign_detail__in=campaign_details,create_at__date = datetime.date.today()).count()
+
+	campaign_metrics = {
+						'drivers_today':drivers_today,
+						'total_impressions':total_impressions,
+						'total_distance_km':total_km,
+						'total_drivers':total_drivers,
+						}
+
+	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaign':campaign,'campaign_metrics':})
 
 	

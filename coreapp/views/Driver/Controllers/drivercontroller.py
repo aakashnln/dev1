@@ -588,7 +588,7 @@ def get_trip_earning(request):
 				else:
 					km_cap = False
 
-				dde = DriverDailyEarning(driver=driver,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
+				dde = DriverDailyEarning(driver=driver,campaign_detail=campaign_detail,total_trip_earning = trip_dict['earning'],trip_count = 1,total_trip_distance = trip_dict['trip_distance'])
 				dde.save()
 
 			tp = TripLog(device_uuid=trip_points[0].device_uuid,userId=trip_points[0].userId,trip_uuid=trip_points[0].trip_uuid,campaignId=trip_points[0].campaignId,trip_loc_path = trip_dict['trip_loc_path'],trip_distance=trip_dict['trip_distance'])

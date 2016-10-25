@@ -29,18 +29,18 @@
     <![endif]-->
     <!-- <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script> -->
-    {% if campaigns|length < 1 %}
+    {% if campaign|length < 1 %}
         <base target="_parent" />
     {% endif %}
 </head>
 
 <body style="padding: 0;margin: 0;">  
         <div id="page-wrapper" style="height: 100vh;">
-                {% if campaigns|length > 0 %}
+                {% if campaign|length > 0 %}
                 <div class="row" style="margin-top: -35px">
                     <div class="col-xs-9 text-left">
                                         <!-- <div class="huge">26</div> -->
-                        <div><h2>{{campaigns.0.campaign_name|title}}</h2></div>
+                        <div><h2>{{campaign.0.campaign_name|title}}</h2></div>
                     </div>
                 </div>
                 <div class="row">
@@ -52,7 +52,7 @@
                                         <i class="fa fa-car fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class="huge">26</div>
+                                        <div class="huge">{{campaign_metrics.drivers_today}} of {{campaign_metrics.total_drivers}}</div>
                                         <div>Drives on road</div>
                                     </div>
                                 </div>
@@ -74,7 +74,7 @@
                                         <i class="fa fa-road fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class="huge">12</div>
+                                        <div class="huge">{{campaign_metrics.total_distance_km}}</div>
                                         <div>Total Kilometers!</div>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@
                                         <i class="fa fa-eye fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class="huge">124</div>
+                                        <div class="huge">{{campaign_metrics.total_impressions}}</div>
                                         <div>Total Impressions!</div>
                                     </div>
                                 </div>
@@ -118,7 +118,7 @@
                                         <i class="fa fa-rupee fa-5x"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div class="huge">13</div>
+                                        <div class="huge">{{campaign_metrics.total_cost}}</div>
                                         <div>Total cost!</div>
                                     </div>
                                 </div>

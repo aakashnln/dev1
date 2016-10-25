@@ -112,6 +112,7 @@ class DriverCampaign(models.Model):
     end_date = models.DateTimeField(default=datetime.datetime.now(),blank=True) # must be filled by admins
     total_distance = models.FloatField(default=0.0)# sums of trip ditances having same campaign ids every 15mins
     total_impressions = models.BigIntegerField(default=0)# a daily jobs calculates and stores this for every active driver campaign every 15mins
+    
     def save(self, *args, **kwargs):
         if not self.created_at:
             self.created_at = datetime.datetime.now()
@@ -123,6 +124,7 @@ class DriverCampaign(models.Model):
     
 class DriverDailyEarning(models.Model):
     driver = models.ForeignKey(Driver, on_delete=models.CASCADE)
+    campaign_detail = models.ForeignKey(ClientCampaignDetail, on_delete=models.CASCADE)
     total_trip_earning = models.FloatField(default=0.0) # total daily earning
     trip_count = models.IntegerField(default=0)
     total_trip_distance = models.FloatField(default=0.0)

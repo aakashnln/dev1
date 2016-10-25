@@ -101,7 +101,7 @@ class ClientCampaign(models.Model):
 	campaign_name = models.CharField(max_length=200,blank=False,default='')
 	client = models.ForeignKey(Client, on_delete=models.CASCADE)
 	cars_required = models.IntegerField(default=0)
-	cars_on_road = models.IntegerField(default=0)
+	cars_on_road = models.IntegerField(default=0) # total wrapped cars on the road
 	impression_target = models.BigIntegerField(default=0)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
@@ -171,6 +171,12 @@ class ClientCampaignDailyDashboard(models.Model): # can be multiple , one per wr
 	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	
+	def save(self, *args, **kwargs):
+		if not self.created_at:
+			self.created_at = datetime.datetime.now()
+		self.updated_at = datetime.datetime.now()
+		return super(ClientCampaignDailyDashboard, self).save(*args, **kwargs)
 
 
 class ClientCampaignDashboard(models.Model): # can be multiple , one per wrap type
@@ -190,3 +196,9 @@ class ClientCampaignDashboard(models.Model): # can be multiple , one per wrap ty
 	wrap_type = models.CharField(choices=WRAP_TYPES,max_length=1,default='4')
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+
+	def save(self, *args, **kwargs):
+		if not self.created_at:
+			self.created_at = datetime.datetime.now()
+		self.updated_at = datetime.datetime.now()
+		return super(ClientCampaignDashboard, self).save(*args, **kwargs)
