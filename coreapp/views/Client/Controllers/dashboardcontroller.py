@@ -129,7 +129,7 @@ def load_campaign_details(request, camp_id=None):
 	# getting the list of campaign details enteries
 	campaign_details = [i.id for i in ClientCampaignDetails.objects.filter(campaign = camp_id)]
 	# the map related parameter parsing happens on the client side
-	# next TODO creating data for showing the routes of the driver 
+	# imp! next TODO creating data for showing the routes of the driver 
 	# for c in [campaign[0].campaign_perimeter]:
 	# c = campaign[0].campaign_perimeter
 	# c = c.replace('(','[')
@@ -140,6 +140,15 @@ def load_campaign_details(request, camp_id=None):
 	
 	# data being populated here are:
 	campaign_metrics = ClientCampaignDashboard.objects.filter(campaign=camp_id).aggregate(total_impressions=Sum('total_imporessions'),total_distance_km=Sum('total_distance_km'),driver_on_road=Sum('driver_on_road'),total_cost=Sum('total_cost'))
+
+	# creating map overlay polygons
+	# creating list of polylins having the path taken by the drivers
+	driver_trajectories = None
+	campaign_trips = TripLog.objects.filter(campaign_id__in=campaign_details)# here campaign_id is campaign details id
+	for trip in campaign_trips:
+		driver_trajectories.append(trip.trip_loc_path)
+	
+	print driver_trajectories
 	#,Sum(F('price')/F('pages'), output_field=FloatField()))
 
 	# total impressions
@@ -153,13 +162,13 @@ def load_campaign_details(request, camp_id=None):
 
 	# drivers_today = DriverDailyEarning.objects.filter(campaign_detail__in=campaign_details,create_at__date = datetime.date.today()).count()
 
-	campaign_metrics = {
-						'drivers_today':drivers_today,
-						'total_impressions':total_impressions,
-						'total_distance_km':total_km,
-						'total_drivers':total_drivers,
-						}
+	# campaign_metrics = {
+	# 					'drivers_today':drivers_today,
+	# 					'total_impressions':total_impressions,
+	# 					'total_distance_km':total_km,
+	# 					'total_drivers':total_drivers,
+	# 					}
 
-	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaign':campaign,'campaign_metrics':})
+	return render(request,'dashboard/dashboard_iframe.html',{'client':client,'title':"DUA Dashboard",'campaign':campaign,'campaign_metrics':campaign_metrics})
 
 	

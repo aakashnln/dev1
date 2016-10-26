@@ -22,7 +22,7 @@ class TripLog(Document):
 	# timestamp = DateTimeField(required=True)
 	userId = LongField(required=True,auto_index=True)#a userID sent by app
 	trip_uuid = StringField(max_length=500,required=True,auto_index=True)#a trip UUID send by app
-	campaign_id = LongField(required=True,default=0)
+	campaign_id = LongField(required=True,default=0) #this is campaign detail ID
 	trip_loc_path = LineStringField(required=True,auto_index=True)
 	trip_distance = FloatField(required=True)
 	created_at = DateTimeField()
