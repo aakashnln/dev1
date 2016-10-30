@@ -99,7 +99,7 @@ class DriverCampaign(models.Model):
     campaign_detail = models.ForeignKey(ClientCampaignDetail, on_delete=models.CASCADE)
     CAMPAIGN_STATUS = (
         ('1', 'Requested'),
-        #('2', 'Scheduled'), one more state to show the schedule
+        #('2', 'Scheduled'), TODO one more state to show the schedule
         ('2', 'Active'),
         ('3', 'Finished'),
         ('4', 'Unknown'),

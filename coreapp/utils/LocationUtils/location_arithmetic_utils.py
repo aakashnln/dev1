@@ -80,7 +80,7 @@ def trip_earning(poly,trip_points,constants):
 				trip_loc_path.append(p.gps_loc['coordinates'])
 
 		trip_point1 = p
-	if trip_distance <= 500:
+	if trip_distance <= 0:#500:
 		return 0.0
 
 	return {'earning':earning,'trip_distance':trip_distance,'trip_loc_path':trip_loc_path}
